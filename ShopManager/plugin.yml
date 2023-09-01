@@ -1,0 +1,5 @@
+name: ShopManager
+author: HWABAEG
+main: ShopManager\Loader
+version: B1
+api: [5.0.0]
