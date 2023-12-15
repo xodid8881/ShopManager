@@ -105,12 +105,12 @@ final class ShopManager{
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
                         $buymoney = "§c구매불가";
                     } else {
-                        $buymoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]} §6원";
+                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
                     }
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
                         $sellmoney = "§c판매불가";
                     } else {
-                        $sellmoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]} §6원";
+                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
                     }
                     $Text = "§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
                     $item = $item->setLore ([(string)$Text]);
@@ -120,12 +120,12 @@ final class ShopManager{
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
                         $buymoney = "§c구매불가";
                     } else {
-                        $buymoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]} §6원";
+                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
                     }
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
                         $sellmoney = "§c판매불가";
                     } else {
-                        $sellmoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]} §6원";
+                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
                     }
                     $Text = "{$lore} \n§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
                     $item = $item->setLore ([(string)$Text]);
@@ -293,12 +293,12 @@ final class ShopManager{
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
                         $buymoney = "§c구매불가";
                     } else {
-                        $buymoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]} §6원";
+                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
                     }
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
                         $sellmoney = "§c판매불가";
                     } else {
-                        $sellmoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]} §6원";
+                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
                     }
                     $Text = "§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매가/판매가 §f를 변경할 수 있습니다.";
                     $item = $item->setLore ([(string)$Text]);
@@ -308,13 +308,16 @@ final class ShopManager{
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
                         $buymoney = "§c구매불가";
                     } else {
-                        $buymoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]} §6원";
+                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
                     }
                     if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
                         $sellmoney = "§c판매불가";
                     } else {
-                        $sellmoney = "{$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]} §6원";
+                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
                     }
+
+                    $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($sellmoney);
+
                     $Text = "{$lore} \n§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §6구매가/판매가 §f를 변경할 수 있습니다.";
                     $item = $item->setLore ([(string)$Text]);
                     $realInv->setItem($i, $item);
@@ -461,7 +464,7 @@ final class ShopManager{
                 $this->BuyCheckEvent($transaction->getPlayer(), "All");
                 return $transaction->discard();
             }
-            return $transaction->continue();
+            return $transaction->discard();
         });
         $inv->send($player);
     }
@@ -547,6 +550,10 @@ final class ShopManager{
                 return;
             }
         } else {
+            if ($buymoney == 0){
+                $player->sendMessage (self::TAG . "해당 물품은 구매가 금지된 물품입니다." );
+                return;
+            }
             $i=0;
             $item=0;
             while ($i==0){
@@ -559,8 +566,17 @@ final class ShopManager{
                     $player->sendMessage (self::TAG . "정상적으로 가득 구매가 완료되었습니다." );
                     $player->sendMessage (self::TAG . "구매에 사용된 총 금액 : {$koreambuymoney}" );
                 } else {
-                    $player->getInventory ()->addItem ( Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->setCount((int)$count) );
-                    ++$item;
+                    $mymoney = MoneyManager::getInstance ()->getMoney ($name);
+                    if ( $mymoney >= $buymoney) {
+                        MoneyManager::getInstance ()->sellMoney ($name, $buymoney);
+                        $player->getInventory ()->addItem ( Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->setCount((int)$count) );
+                        ++$item;
+                    } else {
+                        $koreambuymoney = MoneyManager::getInstance ()->getKoreanMoney ($buymoney*$item);
+                        $player->sendMessage (self::TAG . "정상적으로 가득 구매가 완료되었습니다." );
+                        $player->sendMessage (self::TAG . "구매에 사용된 총 금액 : {$koreambuymoney}" );
+                        ++$i;
+                    }
                 }
             }
         }

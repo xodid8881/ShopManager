@@ -36,23 +36,25 @@ final class ShopAllSellCommand extends Command{
         $name = $sender->getName();
         $money = 0;
         foreach($this->api->shopdb ["프리셋정보"] as $shopname => $v){
-            foreach($this->api->shopdb ["프리셋정보"] [$shopname] as $i => $v){
-                $nbt = $this->api->shopdb ["프리셋정보"] [$shopname] [$i];
-                if (isset($this->api->shopdb [$shopname] ["물품"] [$nbt])){
-                    $sellmoney = (int)$this->api->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
-                    self::$serializer = new BigEndianNbtSerializer();
-                    $item = Item::nbtDeserialize(self::$serializer->read($nbt)->mustGetCompoundTag());
-                    if (is_numeric ($sellmoney)) {
-                        if ($sellmoney > 0) {
-                            $i = 0;
-                            while ($i != 1){
-                                if ($sender->getInventory ()->contains ( $item )){
-                                    MoneyManager::getInstance()->addMoney ($name, $sellmoney);
-                                    $money += $sellmoney;
-                                    $sender->getInventory()->removeItem($item);
-                                    $sender->sendMessage (ShopManager::TAG . "아이템 판매 +$money");
-                                } else {
-                                    ++$i;
+            foreach($this->api->shopdb ["프리셋정보"] [$shopname] as $page => $v){
+                foreach($this->api->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v){
+                    $nbt = $this->api->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
+                    if (isset($this->api->shopdb [$shopname] ["물품"] [$nbt])){
+                        $sellmoney = (int)$this->api->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                        self::$serializer = new BigEndianNbtSerializer();
+                        $item = Item::nbtDeserialize(self::$serializer->read($nbt)->mustGetCompoundTag());
+                        if (is_numeric ($sellmoney)) {
+                            if ($sellmoney > 0) {
+                                $i = 0;
+                                while ($i != 1){
+                                    if ($sender->getInventory ()->contains ( $item )){
+                                        MoneyManager::getInstance()->addMoney ($name, $sellmoney);
+                                        $money += $sellmoney;
+                                        $sender->getInventory()->removeItem($item);
+                                        $sender->sendMessage (ShopManager::TAG . "아이템 판매 +$money");
+                                    } else {
+                                        ++$i;
+                                    }
                                 }
                             }
                         }
