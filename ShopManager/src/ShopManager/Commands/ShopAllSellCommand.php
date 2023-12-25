@@ -51,7 +51,6 @@ final class ShopAllSellCommand extends Command{
                                         MoneyManager::getInstance()->addMoney ($name, $sellmoney);
                                         $money += $sellmoney;
                                         $sender->getInventory()->removeItem($item);
-                                        $sender->sendMessage (ShopManager::TAG . "아이템 판매 +$money");
                                     } else {
                                         ++$i;
                                     }

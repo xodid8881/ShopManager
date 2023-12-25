@@ -498,11 +498,10 @@ final class ShopManager{
         } else {
             $i=0;
             $item=0;
-            $itemcount = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->getCount();
             while ($i==0){
-                $count = $itemcount*1;
-                if ($player->getInventory ()->contains ( Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->setCount((int)$count) )){
-                    $player->getInventory ()->removeItem ( Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->setCount((int)$count) );
+                $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
+                if ($player->getInventory ()->contains ($clickitem)){
+                    $player->getInventory ()->removeItem ($clickitem);
                     ++$item;
                 } else {
                     ++$i;
@@ -525,7 +524,6 @@ final class ShopManager{
         $item = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
         $itemcount = $item->getCount();
         if ($buydata != "All"){
-
             $koreamymoney = MoneyManager::getInstance ()->getKoreanMoney ($mymoney);
             $koreambuymoney = MoneyManager::getInstance ()->getKoreanMoney ($buymoney*$buydata);
             $count = $itemcount*$buydata;
@@ -537,13 +535,13 @@ final class ShopManager{
                 $player->sendMessage (self::TAG . "돈이 부족해 구매하지 못합니다." );
                 $player->sendMessage (self::TAG . "당신의 돈 : {$koreamymoney}\n물품 총 가격 : {$koreambuymoney}" );
                 return;
-            } else {
-                if (!$player->getInventory()->canAddItem($item->setCount((int)$count))) {
+            } else { 
+                if (!$player->getInventory()->canAddItem($item->setCount ((int)$count))) {
                     $player->sendMessage (self::TAG . "인벤토리에 공간이 부족합니다." );
                     $player->sendTip(self::TAG . "인벤토리에 공간이 부족합니다.");
                     return;
                 }
-                $player->getInventory ()->addItem ( $item->setCount((int)$count) );
+                $player->getInventory ()->addItem ($item->setCount ((int)$count));
                 MoneyManager::getInstance ()->sellMoney ($name, $buymoney*$buydata);
                 $player->sendMessage (self::TAG . "정상적으로 구매가 완료되었습니다." );
                 $player->sendMessage (self::TAG . "구매에 사용된 총 금액 : {$koreambuymoney}" );
@@ -557,19 +555,17 @@ final class ShopManager{
             $i=0;
             $item=0;
             while ($i==0){
-                $itemcount = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->getCount();
-                $count = $itemcount*1;
-                if (!$player->getInventory()->canAddItem( Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->setCount((int)$count) )) {
+                $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
+                $mymoney = MoneyManager::getInstance ()->getMoney ($name);
+                if ( $mymoney < $buymoney) {
                     ++$i;
                     $koreambuymoney = MoneyManager::getInstance ()->getKoreanMoney ($buymoney*$item);
-                    MoneyManager::getInstance ()->sellMoney ($name, $buymoney*$item);
                     $player->sendMessage (self::TAG . "정상적으로 가득 구매가 완료되었습니다." );
                     $player->sendMessage (self::TAG . "구매에 사용된 총 금액 : {$koreambuymoney}" );
                 } else {
-                    $mymoney = MoneyManager::getInstance ()->getMoney ($name);
-                    if ( $mymoney >= $buymoney) {
+                    if ($player->getInventory()->canAddItem($clickitem)) {
                         MoneyManager::getInstance ()->sellMoney ($name, $buymoney);
-                        $player->getInventory ()->addItem ( Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag())->setCount((int)$count) );
+                        $player->getInventory ()->addItem ($clickitem);
                         ++$item;
                     } else {
                         $koreambuymoney = MoneyManager::getInstance ()->getKoreanMoney ($buymoney*$item);
@@ -586,7 +582,7 @@ final class ShopManager{
             if($player->isOnline()) {
                 $this->PlayerSettingUI($player);
             }
-        }), 20);
+        }), 10);
     }
 
     public function PlayerSettingUI(Player $player) : void{
@@ -598,7 +594,7 @@ final class ShopManager{
             if($player->isOnline()) {
                 $this->PlayerEventUI($player);
             }
-        }), 20);
+        }), 10);
     }
 
     public function PlayerEventUI(Player $player) : void{

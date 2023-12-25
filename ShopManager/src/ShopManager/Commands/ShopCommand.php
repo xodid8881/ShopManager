@@ -30,14 +30,14 @@ final class ShopCommand extends Command{
         $name = $sender->getName();
         if(!isset ($this->chat [$name])){
             $this->api->ShopGUI($sender);
-            $this->chat [$name] = date("YmdHis", strtotime("+3 seconds"));
+            $this->chat [$name] = date("YmdHis", strtotime("+1 seconds"));
             return true;
         }
-        if(date("YmdHis") - $this->chat [$name] < 3){
+        if(date("YmdHis") - $this->chat [$name] < 1){
             $sender->sendMessage(ShopManager::TAG . "이용 쿨타임이 지나지 않아 불가능합니다.");
         }else{
             $this->api->ShopGUI($sender);
-            $this->chat [$name] = date("YmdHis", strtotime("+3 seconds"));
+            $this->chat [$name] = date("YmdHis", strtotime("+1 seconds"));
         }
         return true;
     }
