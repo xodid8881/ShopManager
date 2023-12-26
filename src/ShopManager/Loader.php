@@ -46,10 +46,10 @@ final class Loader extends PluginBase{
         $cmdMap->register('ShopManager', new ShopAllSellCommand());
         $server->getPluginManager()->registerEvent(PlayerJoinEvent::class, function(PlayerJoinEvent $event) : void {
             $player = $event->getPlayer();
-            $name = $player->getName();
-            if(!isset($this->api->pldb [strtolower($name)])){
-                $this->api->pldb [strtolower($name)] ["상점"] = "없음";
-                $this->api->pldb [strtolower($name)] ["Page"] = 0;
+            $name = strtolower($player->getName());
+            if(!isset($this->api->pldb [$name])){
+                $this->api->pldb [$name] ["상점"] = "없음";
+                $this->api->pldb [$name] ["Page"] = 0;
                 $this->api->save();
             }
         }, EventPriority::MONITOR, $this);

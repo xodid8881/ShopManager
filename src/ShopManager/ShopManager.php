@@ -100,37 +100,20 @@ final class ShopManager{
             foreach($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v){
                 $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
                 $item = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
-                if (!is_null($item->getLore())) {
-                    $lore = $item->getLore();
-                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
-                        $buymoney = "§c구매불가";
-                    } else {
-                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
-                    }
-                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
-                        $sellmoney = "§c판매불가";
-                    } else {
-                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
-                    }
-                    $Text = "§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
-                    $item = $item->setLore ([(string)$Text]);
-                    $realInv->setItem($i, $item);
+                $lore = $item->getLore();
+                if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
+                    $buymoney = "§c구매불가";
                 } else {
-                    $lore = $item->getLore();
-                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
-                        $buymoney = "§c구매불가";
-                    } else {
-                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
-                    }
-                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
-                        $sellmoney = "§c판매불가";
-                    } else {
-                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
-                    }
-                    $Text = "{$lore} \n§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
-                    $item = $item->setLore ([(string)$Text]);
-                    $realInv->setItem($i, $item);
+                    $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
                 }
+                if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
+                    $sellmoney = "§c판매불가";
+                } else {
+                    $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
+                }
+                $lore[] = "§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
+                $item = $item->setLore ($lore);
+                $realInv->setItem($i, $item);
             }
         }
 
