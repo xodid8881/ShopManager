@@ -71,10 +71,13 @@ final class ShopManager
         $page = $this->pldb [$name] ["Page"];
         foreach ($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v) {
             $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
-            if ($type == "purchase") {
+            $shopitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
+            if ($shopitem == $item){
+                if ($type == "purchase") {
 
-            } else if ($type == "sale") {
+                } else if ($type == "sale") {
 
+                }
             }
         }
     }
@@ -114,10 +117,11 @@ final class ShopManager
 
         $inv->setListener(function (InvMenuTransaction $transaction) use ($inv): InvMenuTransactionResult {
             $itemname = $transaction->getItemClicked()->getCustomName();
+            $name = strtolower($transaction->getPlayer()->getName());
             if (isset($this->shopdb [$itemname])) {
-                $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"] = $itemname;
+                $this->pldb [$name] ["상점"] = $itemname;
                 $inv->onClose($transaction->getPlayer());
-                $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] = 0;
+                $this->pldb [$name] ["Page"] = 0;
                 $this->ShopEventGUI($transaction->getPlayer(), $itemname);
                 return $transaction->discard();
             } elseif ($itemname === " ") {
