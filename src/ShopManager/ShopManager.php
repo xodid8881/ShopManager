@@ -31,16 +31,19 @@ final class ShopManager{
 
     public array $pldb;
     public array $shopdb;
+    public array $livedb;
 
     private BigEndianNbtSerializer $serializer;
 
     public function __construct(
         private readonly Config $player,
         private readonly Config $shop,
+        private readonly Config $live,
     ){
         self::setInstance($this);
         $this->pldb = $this->player->getAll();
         $this->shopdb = $this->shop->getAll();
+        $this->livedb = $this->live->getAll();
         $this->serializer = new BigEndianNbtSerializer();
     }
 
@@ -52,11 +55,26 @@ final class ShopManager{
         $this->player->save();
         $this->shop->setAll($this->shopdb);
         $this->shop->save();
+        $this->live->setAll($this->livedb);
+        $this->live->save();
     }
 
     public const TAG = "§c【 §fShop §c】 §7: ";
 
-    public function ShopGUI($player) : void{
+
+
+    public function ShopGUI(Player $player) : void{
+        Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player) : void {
+            if($player->isOnline()) {
+                $this->ShopMainGUI($player);
+            }
+        }), 10);
+    }
+
+    public function ShopMainGUI(Player $player) : void{
+        $this->ShopMain($player);
+    }
+    public function ShopMain($player) : void{
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점목록");
         $realInv = $inv->getInventory();
@@ -90,7 +108,20 @@ final class ShopManager{
         $inv->send($player);
     }
 
-    public function ShopEventGUI($player,$shopname) : void{
+
+    public function ShopEventGUI(Player $player,$shopname) : void{
+        Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player,$shopname) : void {
+            if($player->isOnline()) {
+                $this->ShopEvent($player,$shopname);
+            }
+        }), 10);
+    }
+
+    public function ShopEvent(Player $player,$shopname) : void{
+        $this->Shop($player,$shopname);
+    }
+
+    public function Shop($player,$shopname) : void{
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점");
         $realInv = $inv->getInventory();
@@ -100,20 +131,37 @@ final class ShopManager{
             foreach($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v){
                 $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
                 $item = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
-                $lore = $item->getLore();
-                if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
-                    $buymoney = "§c구매불가";
+                if (!is_null($item->getLore())) {
+                    $lore = $item->getLore();
+                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
+                        $buymoney = "§c구매불가";
+                    } else {
+                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
+                    }
+                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
+                        $sellmoney = "§c판매불가";
+                    } else {
+                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
+                    }
+                    $Text = "§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
+                    $item = $item->setLore ([(string)$Text]);
+                    $realInv->setItem($i, $item);
                 } else {
-                    $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
+                    $lore = $item->getLore();
+                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0){
+                        $buymoney = "§c구매불가";
+                    } else {
+                        $buymoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
+                    }
+                    if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
+                        $sellmoney = "§c판매불가";
+                    } else {
+                        $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
+                    }
+                    $Text = "{$lore} \n§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
+                    $item = $item->setLore ([(string)$Text]);
+                    $realInv->setItem($i, $item);
                 }
-                if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0){
-                    $sellmoney = "§c판매불가";
-                } else {
-                    $sellmoney = MoneyManager::getInstance ()->getKoreanMoney ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
-                }
-                $lore[] = "§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
-                $item = $item->setLore ($lore);
-                $realInv->setItem($i, $item);
             }
         }
 
@@ -176,7 +224,19 @@ final class ShopManager{
         $inv->send($player);
     }
 
-    public function ShopItemSettingGUI($player,$shopname) : void{
+
+    public function ShopItemSettingGUI(Player $player,$shopname) : void{
+        Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player,$shopname) : void {
+            if($player->isOnline()) {
+                $this->ShopItemSetting($player,$shopname);
+            }
+        }), 10);
+    }
+
+    public function ShopItemSetting(Player $player,$shopname) : void{
+        $this->ShopItem($player,$shopname);
+    }
+    public function ShopItem($player,$shopname) : void{
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점");
         $realInv = $inv->getInventory();
@@ -260,7 +320,19 @@ final class ShopManager{
         $inv->send($player);
     }
 
-    public function ShopMoneySettingGUI($player,$shopname) : void{
+    public function ShopMoneySettingGUI(Player $player,$shopname) : void{
+        Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player,$shopname) : void {
+            if($player->isOnline()) {
+                $this->ShopMoneySetting($player,$shopname);
+            }
+        }), 10);
+    }
+
+    public function ShopMoneySetting(Player $player,$shopname) : void{
+        $this->ShopMoney($player,$shopname);
+    }
+
+    public function ShopMoney($player,$shopname) : void{
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점");
         $realInv = $inv->getInventory();
@@ -367,7 +439,18 @@ final class ShopManager{
         $inv->send($player);
     }
 
-    public function ShopBuySellEventGUI($player) : void{
+    public function ShopBuySellEventGUI(Player $player) : void{
+        Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player) : void {
+            if($player->isOnline()) {
+                $this->SellCheck($player);
+            }
+        }), 10);
+    }
+
+    public function ShopBuySellEvent(Player $player) : void{
+        $this->ShopBuySell($player);
+    }
+    public function ShopBuySell($player) : void{
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점 구매/판매 창");
         $realInv = $inv->getInventory();
@@ -452,6 +535,17 @@ final class ShopManager{
         $inv->send($player);
     }
     public function SellCheckEvent(Player $player,$selldata) : void{
+        Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player,$selldata) : void {
+            if($player->isOnline()) {
+                $this->SellCheck($player,$selldata);
+            }
+        }), 10);
+    }
+
+    public function SellCheck(Player $player,$selldata) : void{
+        $this->Sell($player,$selldata);
+    }
+    public function Sell(Player $player,$selldata) : void{
         $name = $player->getName ();
         $mymoney = MoneyManager::getInstance ()->getMoney ($name);
 
@@ -496,7 +590,19 @@ final class ShopManager{
             }
         }
     }
+
     public function BuyCheckEvent(Player $player,$buydata) : void{
+        Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player,$buydata) : void {
+            if($player->isOnline()) {
+                $this->BuyCheck($player,$buydata);
+            }
+        }), 10);
+    }
+
+    public function BuyCheck(Player $player,$buydata) : void{
+        $this->Buy($player,$buydata);
+    }
+    public function Buy(Player $player,$buydata) : void{
         $name = $player->getName ();
         $mymoney = MoneyManager::getInstance ()->getMoney ($name);
 
