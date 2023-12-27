@@ -60,6 +60,7 @@ final class Loader extends PluginBase{
      * @throws JsonException
      */
     protected function onDisable() : void{
+        $this->api->ResetLiveShopConfig();
         $this->api->save();
     }
 }

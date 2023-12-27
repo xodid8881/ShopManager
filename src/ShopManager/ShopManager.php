@@ -63,7 +63,17 @@ final class ShopManager
     }
 
     public const TAG = "§c【 §fShop §c】 §7: ";
-
+    public function ResetLiveShopConfig()
+    {
+        foreach ($this->shopdb ["프리셋정보"] as $shopname => $v) {
+            foreach ($this->shopdb ["프리셋정보"] [$shopname] as $page => $v) {
+                foreach ($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v) {
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"] = 0;
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"] = 0;
+                }
+            }
+        }
+    }
 
     public function LiveShop(Player $player, String $type,String $shopname,Item $item,Int $count)
     {
@@ -74,9 +84,9 @@ final class ShopManager
             $shopitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
             if ($shopitem == $item){
                 if ($type == "purchase") {
-
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"] += $count;
                 } else if ($type == "sale") {
-
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"] += $count;
                 }
             }
         }
@@ -169,7 +179,15 @@ final class ShopManager
                 } else {
                     $sellmoney = MoneyManager::getInstance()->getKoreanMoney($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
                 }
-                $lore[] = "§6§l● §f구매가 §6: §f{$buymoney}\n§6§l● §f판매가 §6: §f{$sellmoney}\n\n§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
+                $PurchaseVolume = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"];
+                $SalesRate = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"];
+                $lore[] =
+                    "§6§l● §f구매가 §6: §f{$buymoney}\n".
+                    "§6§l● §f판매가 §6: §f{$sellmoney}\n\n".
+                    "§6● §f실시간 1시간\n".
+                    "§f구매량 §6: §7{$PurchaseVolume}\n".
+                    "§f판매량 §6: §7{$SalesRate}\n\n".
+                    "§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
                 $item = $item->setLore($lore);
 
                 $realInv->setItem($i, $item);
@@ -317,6 +335,8 @@ final class ShopManager
                             if (!isset($this->shopdb [$shopname] ["물품"] [$item] ["판매가"])) {
                                 $this->shopdb [$shopname] ["물품"] [$item] ["판매가"] = 0;
                             }
+                            $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"] = 0;
+                            $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"] = 0;
                         }
                         $this->save();
                     }
