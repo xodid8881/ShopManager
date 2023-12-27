@@ -96,7 +96,6 @@ final class ShopManager{
             if(isset($this->shopdb [$itemname])){
                 $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"] = $itemname;
                 $inv->onClose($transaction->getPlayer());
-                sleep(1);
                 $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] = 0;
                 $this->ShopEventGUI($transaction->getPlayer(),$itemname);
                 return $transaction->discard();
@@ -169,7 +168,6 @@ final class ShopManager{
             }
             if($itemname === "이전페이지"){
                 $inv->onClose($transaction->getPlayer());
-                sleep(1);
                 $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] -= 1;
                 $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
                 $this->ShopEventGUI($transaction->getPlayer(),$shopname);
@@ -181,7 +179,6 @@ final class ShopManager{
             }
             if($itemname === "다음페이지"){
                 $inv->onClose($transaction->getPlayer());
-                sleep(1);
                 $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] += 1;
                 $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
                 $this->ShopEventGUI($transaction->getPlayer(),$shopname);
@@ -199,7 +196,6 @@ final class ShopManager{
                     $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"] = $shopname;
                     $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점물품"] = $nbt;
                     $inv->onClose($transaction->getPlayer());
-                    sleep(1);
                     $this->ShopBuySellEventGUI($transaction->getPlayer());
                     return $transaction->discard();
                 }
@@ -252,7 +248,6 @@ final class ShopManager{
             }
             if($itemname === "이전페이지"){
                 $inv->onClose($transaction->getPlayer());
-                sleep(1);
                 $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] -= 1;
                 $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
                 $this->ShopItemSettingGUI($transaction->getPlayer(),$shopname);
@@ -263,7 +258,6 @@ final class ShopManager{
             }
             if($itemname === "다음페이지"){
                 $inv->onClose($transaction->getPlayer());
-                sleep(1);
                 $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] += 1;
                 $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
                 $this->ShopItemSettingGUI($transaction->getPlayer(),$shopname);
@@ -375,7 +369,6 @@ final class ShopManager{
             }
             if($itemname === "다음페이지"){
                 $inv->onClose($transaction->getPlayer());
-                sleep(1);
                 $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] += 1;
                 $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
                 $this->ShopMoneySettingGUI($transaction->getPlayer(),$shopname);
@@ -393,7 +386,6 @@ final class ShopManager{
                     $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"] = $shopname;
                     $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점물품"] = $nbt;
                     $inv->onClose($transaction->getPlayer());
-                    sleep(1);
                     $this->ShopMoneySettingUI($transaction->getPlayer());
                     return $transaction->discard();
                 }
@@ -459,7 +451,6 @@ final class ShopManager{
             }
             if($itemname === "이전창 이동"){
                 $inv->onClose($transaction->getPlayer());
-                sleep(1);
                 $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
                 $this->ShopEventGUI($transaction->getPlayer(),$shopname);
                 return $transaction->discard();
