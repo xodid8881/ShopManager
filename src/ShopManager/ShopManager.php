@@ -65,6 +65,21 @@ final class ShopManager
     public const TAG = "§c【 §fShop §c】 §7: ";
 
 
+    public function LiveShop(Player $player, String $type,String $shopname,Item $item,Int $count)
+    {
+        $name = strtolower($player->getName ());
+        $page = $this->pldb [$name] ["Page"];
+        foreach ($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v) {
+            $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
+            if ($type == "purchase") {
+
+            } else if ($type == "sale") {
+
+            }
+        }
+    }
+
+
     public function ShopGUI(Player $player): void
     {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player): void {
@@ -133,8 +148,8 @@ final class ShopManager
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점");
         $realInv = $inv->getInventory();
-        $name = $player->getName();
-        $page = $this->pldb [strtolower($name)] ["Page"];
+        $name = strtolower($player->getName ());
+        $page = $this->pldb [$name] ["Page"];
         if (isset($this->shopdb ["프리셋정보"] [$shopname] [$page])) {
             foreach ($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v) {
                 $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
@@ -168,6 +183,7 @@ final class ShopManager
 
         $inv->setListener(function (InvMenuTransaction $transaction) use ($inv): InvMenuTransactionResult {
             $itemname = $transaction->getItemClicked()->getCustomName();
+            $name = strtolower($transaction->getPlayer()->getName());
             if ($transaction->getItemClicked() == VanillaItems::AIR()) {
                 return $transaction->discard();
             }
@@ -176,8 +192,8 @@ final class ShopManager
             }
             if ($itemname === "이전페이지") {
                 $inv->onClose($transaction->getPlayer());
-                $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] -= 1;
-                $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
+                $this->pldb [$name] ["Page"] -= 1;
+                $shopname = $this->pldb [$name] ["상점"];
                 $this->ShopEventGUI($transaction->getPlayer(), $shopname);
                 return $transaction->discard();
             }
@@ -187,8 +203,8 @@ final class ShopManager
             }
             if ($itemname === "다음페이지") {
                 $inv->onClose($transaction->getPlayer());
-                $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] += 1;
-                $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
+                $this->pldb [$name] ["Page"] += 1;
+                $shopname = $this->pldb [$name] ["상점"];
                 $this->ShopEventGUI($transaction->getPlayer(), $shopname);
                 return $transaction->discard();
             }
@@ -196,13 +212,13 @@ final class ShopManager
                 return $transaction->discard();
             }
             $slot = $transaction->getAction()->getSlot();
-            $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
-            $page = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"];
+            $shopname = $this->pldb [$name] ["상점"];
+            $page = $this->pldb [$name] ["Page"];
             if (isset($this->shopdb ["프리셋정보"] [$shopname] [$page])) {
                 if (isset($this->shopdb ["프리셋정보"] [$shopname] [$page] [$slot])) {
                     $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$slot];
-                    $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"] = $shopname;
-                    $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점물품"] = $nbt;
+                    $this->pldb [$name] ["상점"] = $shopname;
+                    $this->pldb [$name] ["상점물품"] = $nbt;
                     $inv->onClose($transaction->getPlayer());
                     $this->ShopBuySellEventGUI($transaction->getPlayer());
                     return $transaction->discard();
@@ -255,13 +271,14 @@ final class ShopManager
 
         $inv->setListener(function (InvMenuTransaction $transaction) use ($inv): InvMenuTransactionResult {
             $itemname = $transaction->getItemClicked()->getCustomName();
+            $name = strtolower($transaction->getPlayer()->getName());
             if ($itemname === "준비중") {
                 return $transaction->discard();
             }
             if ($itemname === "이전페이지") {
                 $inv->onClose($transaction->getPlayer());
-                $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] -= 1;
-                $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
+                $this->pldb [$name] ["Page"] -= 1;
+                $shopname = $this->pldb [$name] ["상점"];
                 $this->ShopItemSettingGUI($transaction->getPlayer(), $shopname);
                 return $transaction->discard();
             }
@@ -270,8 +287,8 @@ final class ShopManager
             }
             if ($itemname === "다음페이지") {
                 $inv->onClose($transaction->getPlayer());
-                $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"] += 1;
-                $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
+                $this->pldb [$name] ["Page"] += 1;
+                $shopname = $this->pldb [$name] ["상점"];
                 $this->ShopItemSettingGUI($transaction->getPlayer(), $shopname);
                 return $transaction->discard();
             }
@@ -279,8 +296,8 @@ final class ShopManager
                 return $transaction->discard();
             }
             if ($itemname == "설정완료") {
-                $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
-                $page = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Page"];
+                $shopname = $this->pldb [$name] ["상점"];
+                $page = $this->pldb [$name] ["Page"];
                 unset($this->shopdb ["프리셋정보"] [$shopname] [$page]);
                 $i = 0;
                 while ($i <= 44) {
@@ -457,7 +474,7 @@ final class ShopManager
 
         $inv->setListener(function (InvMenuTransaction $transaction) use ($inv): InvMenuTransactionResult {
             $itemname = $transaction->getItemClicked()->getCustomName();
-            $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
+            $name = strtolower($transaction->getPlayer()->getName());
             if ($transaction->getItemClicked() == VanillaItems::AIR()) {
                 return $transaction->discard();
             }
@@ -470,7 +487,7 @@ final class ShopManager
             }
             if ($itemname === "이전창 이동") {
                 $inv->onClose($transaction->getPlayer());
-                $shopname = $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"];
+                $shopname = $this->pldb [$name] ["상점"];
                 $this->ShopEventGUI($transaction->getPlayer(), $shopname);
                 return $transaction->discard();
             }
@@ -487,7 +504,7 @@ final class ShopManager
                 return $transaction->discard();
             }
             if ($itemname === "전체 판매") {
-                $this->SellCheckEvent($transaction->getPlayer(), "All");
+                $this->SellCheckEvent($transaction->getPlayer(), (string)"All");
                 return $transaction->discard();
             }
             if ($itemname === "1개 구매") {
@@ -511,7 +528,7 @@ final class ShopManager
         $inv->send($player);
     }
 
-    public function SellCheckEvent(Player $player, String $selldata): void
+    public function SellCheckEvent(Player $player, $selldata): void
     {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $selldata): void {
             if ($player->isOnline()) {
@@ -520,22 +537,20 @@ final class ShopManager
         }), 10);
     }
 
-    public function SellCheck(Player $player, String $selldata): void
+    public function SellCheck(Player $player, $selldata): void
     {
         $this->Sell($player, $selldata);
     }
 
-    public function Sell(Player $player, String $selldata): void
+    public function Sell(Player $player, $selldata): void
     {
-        $name = $player->getName();
-        $mymoney = MoneyManager::getInstance()->getMoney($name);
-
-        $shopname = $this->pldb [strtolower($name)] ["상점"];
-        $nbt = $this->pldb [strtolower($name)] ["상점물품"];
+        $name = strtolower($player->getName());
+        $shopname = $this->pldb [$name] ["상점"];
+        $nbt = $this->pldb [$name] ["상점물품"];
         $sellmoney = $this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
 
-        $item = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
-        $itemcount = $item->getCount();
+        $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
+        $itemcount = $clickitem->getCount();
         if ($selldata != "All") {
             $koreamsellmoney = MoneyManager::getInstance()->getKoreanMoney($sellmoney * $selldata);
             $count = $itemcount * $selldata;
@@ -543,11 +558,12 @@ final class ShopManager
                 $player->sendMessage(self::TAG . "해당 물품은 판매가 금지된 물품입니다.");
                 return;
             }
-            if ($player->getInventory()->contains($item->setCount((int)$count))) {
-                $player->getInventory()->removeItem($item->setCount((int)$count));
+            if ($player->getInventory()->contains($clickitem->setCount((int)$count))) {
+                $player->getInventory()->removeItem($clickitem->setCount((int)$count));
                 MoneyManager::getInstance()->addMoney($name, $sellmoney * $selldata);
                 $player->sendMessage(self::TAG . "정상적으로 판매가 완료되었습니다.");
                 $player->sendMessage(self::TAG . "판매후 얻은 총 금액 : {$koreamsellmoney}");
+                $this->LiveShop ($player,"sale",$shopname,$clickitem,$count);
                 return;
             } else {
                 $player->sendMessage(self::TAG . "판매할 물품의 갯수가 부족합니다.");
@@ -555,18 +571,19 @@ final class ShopManager
             }
         } else {
             $i = 0;
-            $item = 0;
+            $count = 0;
             while ($i == 0) {
                 $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
                 if ($player->getInventory()->contains($clickitem)) {
                     $player->getInventory()->removeItem($clickitem);
-                    ++$item;
+                    ++$count;
                 } else {
                     ++$i;
-                    MoneyManager::getInstance()->addMoney($name, $sellmoney * $item);
-                    $koreamsellmoney = MoneyManager::getInstance()->getKoreanMoney($sellmoney * $item);
+                    MoneyManager::getInstance()->addMoney($name, $sellmoney * $count);
+                    $koreamsellmoney = MoneyManager::getInstance()->getKoreanMoney($sellmoney * $count);
                     $player->sendMessage(self::TAG . "정상적으로 전량 판매가 완료되었습니다.");
                     $player->sendMessage(self::TAG . "판매후 얻은 총 금액 : {$koreamsellmoney}");
+                    $this->LiveShop ($player,"sale",$shopname,$clickitem,$count);
                 }
             }
         }
@@ -588,15 +605,15 @@ final class ShopManager
 
     public function Buy(Player $player, $buydata): void
     {
-        $name = $player->getName();
+        $name = strtolower($player->getName());
         $mymoney = MoneyManager::getInstance()->getMoney($name);
 
-        $shopname = $this->pldb [strtolower($name)] ["상점"];
-        $nbt = $this->pldb [strtolower($name)] ["상점물품"];
+        $shopname = $this->pldb [$name] ["상점"];
+        $nbt = $this->pldb [$name] ["상점물품"];
         $buymoney = $this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
 
-        $item = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
-        $itemcount = $item->getCount();
+        $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
+        $itemcount = $clickitem->getCount();
         if ($buydata != "All") {
             $koreamymoney = MoneyManager::getInstance()->getKoreanMoney($mymoney);
             $koreambuymoney = MoneyManager::getInstance()->getKoreanMoney($buymoney * $buydata);
@@ -610,15 +627,16 @@ final class ShopManager
                 $player->sendMessage(self::TAG . "당신의 돈 : {$koreamymoney}\n물품 총 가격 : {$koreambuymoney}");
                 return;
             } else {
-                if (!$player->getInventory()->canAddItem($item->setCount((int)$count))) {
+                if (!$player->getInventory()->canAddItem($clickitem->setCount((int)$count))) {
                     $player->sendMessage(self::TAG . "인벤토리에 공간이 부족합니다.");
                     $player->sendTip(self::TAG . "인벤토리에 공간이 부족합니다.");
                     return;
                 }
-                $player->getInventory()->addItem($item->setCount((int)$count));
+                $player->getInventory()->addItem($clickitem->setCount((int)$count));
                 MoneyManager::getInstance()->sellMoney($name, $buymoney * $buydata);
                 $player->sendMessage(self::TAG . "정상적으로 구매가 완료되었습니다.");
                 $player->sendMessage(self::TAG . "구매에 사용된 총 금액 : {$koreambuymoney}");
+                $this->LiveShop ($player,"purchase",$shopname,$clickitem,$count);
                 return;
             }
         } else {
@@ -627,24 +645,25 @@ final class ShopManager
                 return;
             }
             $i = 0;
-            $item = 0;
+            $count = 0;
             while ($i == 0) {
                 $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
                 $mymoney = MoneyManager::getInstance()->getMoney($name);
                 if ($mymoney < $buymoney) {
                     ++$i;
-                    $koreambuymoney = MoneyManager::getInstance()->getKoreanMoney($buymoney * $item);
+                    $koreambuymoney = MoneyManager::getInstance()->getKoreanMoney($buymoney * $count);
                     $player->sendMessage(self::TAG . "정상적으로 가득 구매가 완료되었습니다.");
                     $player->sendMessage(self::TAG . "구매에 사용된 총 금액 : {$koreambuymoney}");
                 } else {
                     if ($player->getInventory()->canAddItem($clickitem)) {
                         MoneyManager::getInstance()->sellMoney($name, $buymoney);
                         $player->getInventory()->addItem($clickitem);
-                        ++$item;
+                        ++$count;
                     } else {
-                        $koreambuymoney = MoneyManager::getInstance()->getKoreanMoney($buymoney * $item);
+                        $koreambuymoney = MoneyManager::getInstance()->getKoreanMoney($buymoney * $count);
                         $player->sendMessage(self::TAG . "정상적으로 가득 구매가 완료되었습니다.");
                         $player->sendMessage(self::TAG . "구매에 사용된 총 금액 : {$koreambuymoney}");
+                        $this->LiveShop ($player,"purchase",$shopname,$clickitem,$count);
                         ++$i;
                     }
                 }
