@@ -63,6 +63,145 @@ final class ShopManager
     }
 
     public const TAG = "§c【 §fShop §c】 §7: ";
+
+    public function ChangeLiveShopConfig()
+    {
+        foreach ($this->shopdb ["프리셋정보"] as $shopname => $v) {
+            foreach ($this->shopdb ["프리셋정보"] [$shopname] as $page => $v) {
+                foreach ($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v) {
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"] = 0;
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"] = 0;
+                    $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
+                    $Price = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                    $PurchasePrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
+
+                    $BackPrice = (int)$this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"];
+                    $BackPurchasePrice = (int)$this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"];
+
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전구매가"] = $BackPrice;
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전판매가"] = $BackPurchasePrice;
+
+                    $rand = mt_rand (1, 4);
+                    if ($rand == 1) {
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"] != 0){
+                                if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]-$money <= 0){
+                                    $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                                } else {
+                                    $NewPrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]-$money;
+                                }
+                            } else {
+                                $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                            }
+                        } else {
+                            $NewPrice = 0;
+                        }
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"] != 0){
+                                $NewPurchasePrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"]+$money;
+                            } else {
+                                $NewPurchasePrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
+                            }
+                        } else {
+                            $NewPurchasePrice = 0;
+                        }
+                    } else if ($rand == 2) {
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"] != 0){
+                                if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]+$money >= $this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]){
+                                    $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                                } else {
+                                    $NewPrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]+$money;
+                                }
+                            } else {
+                                $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                            }
+                        } else {
+                            $NewPrice = 0;
+                        }
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"] != 0){
+                                if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"]-$money <= $Price){
+                                    $NewPurchasePrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
+                                } else {
+                                    $NewPurchasePrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"]-$money;
+                                }
+                            } else {
+                                $NewPurchasePrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
+                            }
+                        } else {
+                            $NewPurchasePrice = 0;
+                        }
+                    } else if ($rand == 3) {
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"] != 0){
+                                if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]+$money >= $this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]){
+                                    $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                                } else {
+                                    $NewPrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]+$money;
+                                }
+                            } else {
+                                $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                            }
+                        } else {
+                            $NewPrice = 0;
+                        }
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"] != 0){
+                                $NewPurchasePrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"]+$money;
+                            } else {
+                                $NewPurchasePrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
+                            }
+                        } else {
+                            $NewPurchasePrice = 0;
+                        }
+                    } else if ($rand == 4) {
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"] != 0){
+                                if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]-$money <= 0){
+                                    $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                                } else {
+                                    $NewPrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"]-$money;
+                                }
+                            } else {
+                                $NewPrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                            }
+                        } else {
+                            $NewPrice = 0;
+                        }
+                        $money = mt_rand(1, 25);
+                        if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] != 0){
+                            if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"] != 0){
+                                if ($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"]-$money <= $Price){
+                                    $NewPurchasePrice = $PurchasePrice;
+                                } else {
+                                    $NewPurchasePrice = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"]-$money;
+                                }
+                            } else {
+                                $NewPurchasePrice = (int)$this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
+                            }
+                        } else {
+                            $NewPurchasePrice = 0;
+                        }
+                    }
+
+                    if ($NewPurchasePrice <= $NewPrice){
+                        $NewPrice = $NewPrice-$NewPurchasePrice-1;
+                    }
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"] = $NewPurchasePrice;
+                    $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"] = $NewPrice;
+                }
+            }
+        }
+    }
+
     public function ResetLiveShopConfig()
     {
         foreach ($this->shopdb ["프리셋정보"] as $shopname => $v) {
@@ -70,6 +209,14 @@ final class ShopManager
                 foreach ($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v) {
                     $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"] = 0;
                     $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"] = 0;
+                    if (!isset($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전구매가"])){
+                        $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전구매가"] = 0;
+                        $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"] = 0;
+                    }
+                    if (!isset($this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전판매가"])){
+                        $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전판매가"] = 0;
+                        $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"] = 0;
+                    }
                 }
             }
         }
@@ -168,25 +315,63 @@ final class ShopManager
             foreach ($this->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v) {
                 $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
                 $item = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
-                $lore = $item->getLore();
+                $PurchaseVolume = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"];
+                $SalesRate = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"];
+
+                $item = $this->serializer->write(new TreeRoot($item->nbtSerialize()));
+                $Price = (int)$this->shopdb [$shopname] ["물품"] [$item] ["구매가"];
+                $NewPrice = (int)$this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"];
+
+                $PurchasePrice = (int)$this->shopdb [$shopname] ["물품"] [$item] ["판매가"];
+                $NewPurchasePrice = (int)$this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"];
+                if ($Price >= 0){
+                    if ($Price < $NewPrice){
+                        $tag = $NewPrice-$Price;
+                        $buytag = "§a+{$tag}";
+                    } else if ($Price > $NewPrice){
+                        $tag = $Price-$NewPrice;
+                        $buytag = "§c-{$tag}";
+                    } else if ($Price == $NewPrice){
+                        $buytag = "§c변동없음";
+                    }
+                } else {
+                    $buytag = "§c변동없음";
+                }
                 if ($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"] <= 0) {
                     $buymoney = "§c구매불가";
                 } else {
-                    $buymoney = MoneyManager::getInstance()->getKoreanMoney($this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"]);
+                    $buymoney = MoneyManager::getInstance()->getKoreanMoney($NewPrice);
+
                 }
+                if ($PurchasePrice >= 0){
+                    if ($PurchasePrice < $NewPurchasePrice){
+                        $tag = $NewPurchasePrice-$PurchasePrice;
+                        $selltag = "§a+{$tag}";
+                    } else if ($PurchasePrice > $NewPurchasePrice){
+                        $tag = $PurchasePrice-$NewPurchasePrice;
+                        $selltag = "§c-{$tag}";
+                    } else if ($PurchasePrice == $NewPurchasePrice){
+                        $selltag = "§c변동없음";
+                    }
+                } else {
+                    $selltag = "§c변동없음";
+                }
+
                 if ($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"] <= 0) {
                     $sellmoney = "§c판매불가";
                 } else {
-                    $sellmoney = MoneyManager::getInstance()->getKoreanMoney($this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"]);
+                    $sellmoney = MoneyManager::getInstance()->getKoreanMoney($NewPurchasePrice);
                 }
-                $PurchaseVolume = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"];
-                $SalesRate = $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"];
+                $item = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
+                $lore = $item->getLore();
                 $lore[] =
-                    "§6§l● §f구매가 §6: §f{$buymoney}\n".
-                    "§6§l● §f판매가 §6: §f{$sellmoney}\n\n".
-                    "§6● §f실시간 1시간\n".
-                    "§f구매량 §6: §7{$PurchaseVolume}\n".
-                    "§f판매량 §6: §7{$SalesRate}\n\n".
+                    "§6§l● §f구매가 §6: §f{$buymoney} | #$Price 원\n".
+                    "§6§l● §f변동 된 정보§6: §f{$buytag} §f원\n\n".
+                    "§6§l● §f판매가 §6: §f{$sellmoney} | #$PurchasePrice 원\n".
+                    "§6§l● §f변동 된 정보§6: §f{$selltag} §f원\n\n".
+                    "§6● §f실시간 (1시간)\n".
+                    "§6● §f구매량 §6: §7{$PurchaseVolume} §f개\n".
+                    "§6● §f판매량 §6: §7{$SalesRate} §f개\n\n".
                     "§6§l● §f클릭시 §6구매/판매 §f를 이용할 수 있습니다.";
                 $item = $item->setLore($lore);
 
@@ -337,6 +522,12 @@ final class ShopManager
                             }
                             $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["구매량"] = 0;
                             $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["판매량"] = 0;
+
+                            $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전구매가"] = 0;
+                            $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경구매가"] = 0;
+                            $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["이전판매가"] = 0;
+                            $this->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"] = 0;
+
                         }
                         $this->save();
                     }
@@ -441,6 +632,7 @@ final class ShopManager
                     $nbt = $this->shopdb ["프리셋정보"] [$shopname] [$page] [$slot];
                     $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점"] = $shopname;
                     $this->pldb [strtolower($transaction->getPlayer()->getName())] ["상점물품"] = $nbt;
+                    $this->pldb [strtolower($transaction->getPlayer()->getName())] ["Click"] = $slot;
                     $inv->onClose($transaction->getPlayer());
                     $this->ShopMoneySettingUI($transaction->getPlayer());
                     return $transaction->discard();
@@ -457,7 +649,7 @@ final class ShopManager
     {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player): void {
             if ($player->isOnline()) {
-                $this->SellCheck($player);
+                $this->ShopBuySellEvent($player);
             }
         }), 10);
     }
@@ -571,7 +763,11 @@ final class ShopManager
         $name = strtolower($player->getName());
         $shopname = $this->pldb [$name] ["상점"];
         $nbt = $this->pldb [$name] ["상점물품"];
-        $sellmoney = $this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+
+        $page = $this->pldb [$name] ["Page"];
+        $slot = $this->pldb [$name] ["Click"];
+        $sellmoney = $this->livedb ["프리셋정보"] [$shopname] [$page] [$slot] ["변경판매가"];
+        //$sellmoney = $this->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
 
         $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
         $itemcount = $clickitem->getCount();
@@ -634,7 +830,11 @@ final class ShopManager
 
         $shopname = $this->pldb [$name] ["상점"];
         $nbt = $this->pldb [$name] ["상점물품"];
-        $buymoney = $this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
+
+        $page = $this->pldb [$name] ["Page"];
+        $slot = $this->pldb [$name] ["Click"];
+        $buymoney = $this->livedb ["프리셋정보"] [$shopname] [$page] [$slot] ["변경구매가"];
+        //$buymoney = $this->shopdb [$shopname] ["물품"] [$nbt] ["구매가"];
 
         $clickitem = Item::nbtDeserialize($this->serializer->read($nbt)->mustGetCompoundTag());
         $itemcount = $clickitem->getCount();
