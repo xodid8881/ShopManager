@@ -79,7 +79,7 @@ final class ShopManager
         $this->ShopMain($player);
     }
 
-    public function ShopMain($player): void
+    public function ShopMain(Player $player): void
     {
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점목록");
@@ -114,7 +114,7 @@ final class ShopManager
     }
 
 
-    public function ShopEventGUI(Player $player, $shopname): void
+    public function ShopEventGUI(Player $player, String $shopname): void
     {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $shopname): void {
             if ($player->isOnline()) {
@@ -123,12 +123,12 @@ final class ShopManager
         }), 10);
     }
 
-    public function ShopEvent(Player $player, $shopname): void
+    public function ShopEvent(Player $player, String $shopname): void
     {
         $this->Shop($player, $shopname);
     }
 
-    public function Shop($player, $shopname): void
+    public function Shop(Player $player, String $shopname): void
     {
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점");
@@ -214,7 +214,7 @@ final class ShopManager
     }
 
 
-    public function ShopItemSettingGUI(Player $player, $shopname): void
+    public function ShopItemSettingGUI(Player $player, String $shopname): void
     {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $shopname): void {
             if ($player->isOnline()) {
@@ -223,12 +223,12 @@ final class ShopManager
         }), 10);
     }
 
-    public function ShopItemSetting(Player $player, $shopname): void
+    public function ShopItemSetting(Player $player, String $shopname): void
     {
         $this->ShopItem($player, $shopname);
     }
 
-    public function ShopItem($player, $shopname): void
+    public function ShopItem(Player $player, String $shopname): void
     {
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점");
@@ -311,7 +311,7 @@ final class ShopManager
         $inv->send($player);
     }
 
-    public function ShopMoneySettingGUI(Player $player, $shopname): void
+    public function ShopMoneySettingGUI(Player $player, String $shopname): void
     {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $shopname): void {
             if ($player->isOnline()) {
@@ -320,12 +320,12 @@ final class ShopManager
         }), 10);
     }
 
-    public function ShopMoneySetting(Player $player, $shopname): void
+    public function ShopMoneySetting(Player $player, String $shopname): void
     {
         $this->ShopMoney($player, $shopname);
     }
 
-    public function ShopMoney($player, $shopname): void
+    public function ShopMoney(Player $player, String $shopname): void
     {
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점");
@@ -426,7 +426,7 @@ final class ShopManager
         $this->ShopBuySell($player);
     }
 
-    public function ShopBuySell($player): void
+    public function ShopBuySell(Player $player): void
     {
         $inv = InvMenu::create(InvMenuTypeIds::TYPE_DOUBLE_CHEST);
         $inv->setName("상점 구매/판매 창");
@@ -511,7 +511,7 @@ final class ShopManager
         $inv->send($player);
     }
 
-    public function SellCheckEvent(Player $player, $selldata): void
+    public function SellCheckEvent(Player $player, String $selldata): void
     {
         Loader::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $selldata): void {
             if ($player->isOnline()) {
@@ -520,12 +520,12 @@ final class ShopManager
         }), 10);
     }
 
-    public function SellCheck(Player $player, $selldata): void
+    public function SellCheck(Player $player, String $selldata): void
     {
         $this->Sell($player, $selldata);
     }
 
-    public function Sell(Player $player, $selldata): void
+    public function Sell(Player $player, String $selldata): void
     {
         $name = $player->getName();
         $mymoney = MoneyManager::getInstance()->getMoney($name);
