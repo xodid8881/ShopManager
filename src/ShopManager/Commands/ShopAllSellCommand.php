@@ -40,19 +40,20 @@ final class ShopAllSellCommand extends Command{
                 foreach($this->api->shopdb ["프리셋정보"] [$shopname] [$page] as $i => $v){
                     $nbt = $this->api->shopdb ["프리셋정보"] [$shopname] [$page] [$i];
                     if (isset($this->api->shopdb [$shopname] ["물품"] [$nbt])){
-                        $sellmoney = (int)$this->api->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                        //$sellmoney = (int)$this->api->shopdb [$shopname] ["물품"] [$nbt] ["판매가"];
+                        $sellmoney = $this->api->livedb ["프리셋정보"] [$shopname] [$page] [$i] ["변경판매가"];
                         self::$serializer = new BigEndianNbtSerializer();
                         $item = Item::nbtDeserialize(self::$serializer->read($nbt)->mustGetCompoundTag());
                         if (is_numeric ($sellmoney)) {
                             if ($sellmoney > 0) {
-                                $i = 0;
-                                while ($i != 1){
+                                $count = 0;
+                                while ($count != 1){
                                     if ($sender->getInventory ()->contains ( $item )){
                                         MoneyManager::getInstance()->addMoney ($name, $sellmoney);
                                         $money += $sellmoney;
                                         $sender->getInventory()->removeItem($item);
                                     } else {
-                                        ++$i;
+                                        ++$count;
                                     }
                                 }
                             }
@@ -61,7 +62,7 @@ final class ShopAllSellCommand extends Command{
                 }
             }
         }
-
+        $this->api->LiveShop ($sender,"sale",$shopname,$i,$count);
         $sender->sendMessage (ShopManager::TAG . "모든 물품을 판매했습니다");
         $koreammoney = MoneyManager::getInstance ()->getKoreanMoney ($money);
         $sender->sendMessage (ShopManager::TAG . "{$koreammoney} 원을 얻었습니다.");
