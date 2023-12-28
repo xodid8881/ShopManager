@@ -54,14 +54,13 @@ final class Loader extends PluginBase{
                 $this->api->save();
             }
         }, EventPriority::MONITOR, $this);
-        $this->api->ResetLiveShopConfig();
+        $this->api->ChangeLiveShopConfig();
     }
 
     /**
      * @throws JsonException
      */
     protected function onDisable() : void{
-        $this->api->ChangeLiveShopConfig();
         $this->api->save();
     }
 }
